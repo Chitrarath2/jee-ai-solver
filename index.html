@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE AI Solver - Free Education for All</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .subject-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .subject-btn {
+            padding: 12px 24px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .subject-btn:hover, .subject-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .question-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .question-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .solve-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .solve-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .solve-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .solution-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .solution-section.show {
+            display: block;
+        }
+        
+        .solution-title {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .solution-content {
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .sample-questions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f4fd;
+            border-radius: 10px;
+        }
+        
+        .sample-questions h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .sample-question {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .sample-question:hover {
+            background: #f0f0f0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 JEE AI Solver</h1>
+            <p>Free AI-powered solutions for Physics, Chemistry & Mathematics</p>
+        </div>
+        
+        <div class="subject-selector">
+            <button class="subject-btn active" data-subject="physics">⚛️ Physics</button>
+            <button class="subject-btn" data-subject="chemistry">🧪 Chemistry</button>
+            <button class="subject-btn" data-subject="mathematics">📐 Mathematics</button>
+        </div>
+        
+        <div class="input-section">
+            <label for="questionInput">Enter your JEE question:</label>
+            <textarea 
+                id="questionInput" 
+                class="question-input" 
+                placeholder="Type or paste your JEE question here... 
+
+For example:
+- A particle moves with constant acceleration. If it travels 10m in first 2 seconds, find its acceleration.
+- Find the derivative of x³ + 2x² - 5x + 1
+- Balance the equation: H₂SO₄ + NaOH → Na₂SO₄ + H₂O"
+            ></textarea>
+        </div>
+        
+        <button id="solveBtn" class="solve-btn">
+            🚀 Solve This Problem
+        </button>
+        
+        <div id="solutionSection" class="solution-section">
+            <div class="solution-title">💡 AI Solution:</div>
+            <div id="solutionContent" class="solution-content"></div>
+        </div>
+        
+        <div class="sample-questions">
+            <h3>📚 Try These Sample Questions:</h3>
+            <div class="sample-question" data-question="A ball is thrown vertically upward with initial velocity 20 m/s. Find the maximum height reached. (g = 10 m/s²)">
+                🏀 Physics: Projectile motion problem
+            </div>
+            <div class="sample-question" data-question="Find the integral of ∫(3x² + 2x - 1)dx">
+                📊 Math: Integration problem
+            </div>
+            <div class="sample-question" data-question="Calculate the molarity of a solution containing 40g NaOH in 500ml water. (Molecular weight of NaOH = 40)">
+                ⚗️ Chemistry: Molarity calculation
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🌟 Made with ❤️ for students who dream big but lack resources</p>
+            <p>Free forever • No ads • Open source</p>
+        </div>
+    </div>
+
+    <script>
+        // Subject selection
+        document.querySelectorAll('.subject-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Sample questions
+        document.querySelectorAll('.sample-question').forEach(question => {
+            question.addEventListener('click', () => {
+                document.getElementById('questionInput').value = question.dataset.question;
+            });
+        });
+
+        // Main solve function
+        document.getElementById('solveBtn').addEventListener('click', async () => {
+            const question = document.getElementById('questionInput').value.trim();
+            const subject = document.querySelector('.subject-btn.active').dataset.subject;
+            
+            if (!question) {
+                alert('Please enter a question first!');
+                return;
+            }
+            
+            const solveBtn = document.getElementById('solveBtn');
+            const solutionSection = document.getElementById('solutionSection');
+            const solutionContent = document.getElementById('solutionContent');
+            
+            // Show loading state
+            solveBtn.innerHTML = '<div class="loading"></div>Solving...';
+            solveBtn.disabled = true;
+            
+            try {
+                // Simulate AI processing (replace this with actual AI API call)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Demo solution (replace with actual AI response)
+                const solution = generateDemoSolution(question, subject);
+                
+                solutionContent.textContent = solution;
+                solutionSection.classList.add('show');
+                solutionSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                solutionContent.textContent = 'Sorry, there was an error processing your question. Please try again.';
+                solutionSection.classList.add('show');
+            } finally {
+                solveBtn.innerHTML = '🚀 Solve This Problem';
+                solveBtn.disabled = false;
+            }
+        });
+
+        // Demo solution generator (replace with actual AI integration)
+        function generateDemoSolution(question, subject) {
+            const solutions = {
+                physics: `📋 STEP-BY-STEP SOLUTION:
+
+🎯 Given Information:
+- This appears to be a ${subject} problem
+- Key concepts involved: Motion, Forces, Energy
+
+📐 Solution Steps:
+1. Identify the given values and what we need to find
+2. Choose the appropriate physics formula
+3. Substitute the values
+4. Calculate the result
+5. Check units and reasonableness
+
+💡 Detailed Working:
+[This is a demo solution. In the real app, AI will provide detailed step-by-step solutions]
+
+✅ Final Answer:
+The solution involves applying fundamental physics principles.
+
+🎓 Key Learning Points:
+- Remember to identify given values first
+- Use appropriate formulas
+- Always check your units
+- Practice similar problems for better understanding
+
+💫 Need more help? Try breaking down complex problems into smaller steps!`,
+
+                chemistry: `🧪 CHEMISTRY SOLUTION:
+
+🎯 Given Information:
+- This is a ${subject} problem
+- Key concepts: Chemical reactions, Stoichiometry, Molecular calculations
+
+📋 Solution Approach:
+1. Identify the type of chemical problem
+2. Write relevant equations
+3. Apply stoichiometric principles
+4. Calculate step by step
+5. Verify the answer
+
+💡 Detailed Working:
+[This is a demo solution. In the real app, AI will provide detailed chemical equations and calculations]
+
+✅ Final Answer:
+The solution follows chemical principles and stoichiometry.
+
+🎓 Key Learning Points:
+- Balance chemical equations first
+- Use molar relationships
+- Pay attention to significant figures
+- Practice with different reaction types
+
+🧬 Remember: Chemistry is about understanding molecular interactions!`,
+
+                mathematics: `📐 MATHEMATICS SOLUTION:
+
+🎯 Given Problem:
+- This is a ${subject} problem
+- Key concepts: Algebra, Calculus, Geometry (as applicable)
+
+📋 Solution Method:
+1. Analyze the problem type
+2. Identify the mathematical concepts needed
+3. Apply appropriate formulas or methods
+4. Solve step by step
+5. Verify the solution
+
+💡 Detailed Working:
+[This is a demo solution. In the real app, AI will provide detailed mathematical steps]
+
+✅ Final Answer:
+The solution follows mathematical principles and logic.
+
+🎓 Key Learning Points:
+- Break complex problems into smaller parts
+- Use systematic approaches
+- Check your work by substitution
+- Practice regularly for speed and accuracy
+
+📊 Pro Tip: Always draw diagrams when possible - they make math problems clearer!`
+            };
+
+            return solutions[subject] || solutions.physics;
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate elements on load
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
