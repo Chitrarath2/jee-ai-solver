@@ -46,6 +46,24 @@
             font-size: 1.1em;
         }
         
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         .subject-selector {
             display: flex;
             justify-content: center;
@@ -129,6 +147,12 @@
         
         .solution-section.show {
             display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .solution-title {
@@ -136,12 +160,44 @@
             font-size: 1.3em;
             margin-bottom: 15px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .solution-content {
             color: #555;
             line-height: 1.6;
             white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border: 1px solid #28a745;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
         }
         
         .sample-questions {
@@ -162,11 +218,14 @@
             margin: 10px 0;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
         }
         
         .sample-question:hover {
-            background: #f0f0f0;
+            background: #f0f8ff;
+            border-left-color: #667eea;
+            transform: translateX(5px);
         }
         
         .footer {
@@ -191,13 +250,67 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .error-message {
+            background: #ffe6e6;
+            color: #d8000c;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d8000c;
+            margin-top: 15px;
+        }
+        
+        .success-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎯 JEE AI Solver</h1>
-            <p>Free AI-powered solutions for Physics, Chemistry & Mathematics</p>
+            <p>Powered by Custom AI Model - Built for Underserved Students</p>
+            <div class="ai-badge">🤖 Custom AI Engine Active</div>
+        </div>
+        
+        <div class="ai-status">
+            <div class="status-dot"></div>
+            <span>AI Model: Online & Ready | Processing Speed: <strong>Real-time</strong></span>
+        </div>
+        
+        <div class="success-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalSolved">0</div>
+                <div class="stat-label">Problems Solved</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Free Forever</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Subjects Covered</div>
+            </div>
         </div>
         
         <div class="subject-selector">
@@ -213,42 +326,60 @@
                 class="question-input" 
                 placeholder="Type or paste your JEE question here... 
 
-For example:
-- A particle moves with constant acceleration. If it travels 10m in first 2 seconds, find its acceleration.
-- Find the derivative of x³ + 2x² - 5x + 1
-- Balance the equation: H₂SO₄ + NaOH → Na₂SO₄ + H₂O"
+Our custom AI specializes in:
+✓ Step-by-step solutions with detailed explanations
+✓ Formula identification and application  
+✓ Concept clarification and study tips
+✓ Multiple solving approaches when applicable
+
+Example questions:
+• A particle moves with constant acceleration 2 m/s². If it travels 10m in first 2 seconds, find its initial velocity.
+• Find the derivative of f(x) = x³ + 2x² - 5x + 1
+• Calculate molarity of solution containing 40g NaOH in 500ml water (Mol. wt. NaOH = 40)"
             ></textarea>
         </div>
         
         <button id="solveBtn" class="solve-btn">
-            🚀 Solve This Problem
+            🚀 Solve with Custom AI
         </button>
         
         <div id="solutionSection" class="solution-section">
-            <div class="solution-title">💡 AI Solution:</div>
+            <div class="solution-title">
+                <span>🧠 AI Solution Analysis:</span>
+                <span id="confidenceScore" style="font-size: 0.9em; color: #28a745;"></span>
+            </div>
             <div id="solutionContent" class="solution-content"></div>
         </div>
         
         <div class="sample-questions">
             <h3>📚 Try These Sample Questions:</h3>
-            <div class="sample-question" data-question="A ball is thrown vertically upward with initial velocity 20 m/s. Find the maximum height reached. (g = 10 m/s²)">
-                🏀 Physics: Projectile motion problem
+            <div class="sample-question" data-question="A ball is thrown vertically upward with initial velocity 20 m/s. Find the maximum height reached. Take g = 10 m/s²">
+                🏀 Physics: Projectile motion with gravity
             </div>
-            <div class="sample-question" data-question="Find the integral of ∫(3x² + 2x - 1)dx">
-                📊 Math: Integration problem
+            <div class="sample-question" data-question="Find the derivative of f(x) = 3x⁴ + 2x³ - 5x² + 7x - 1">
+                📊 Mathematics: Differentiation using power rule
             </div>
-            <div class="sample-question" data-question="Calculate the molarity of a solution containing 40g NaOH in 500ml water. (Molecular weight of NaOH = 40)">
-                ⚗️ Chemistry: Molarity calculation
+            <div class="sample-question" data-question="Calculate the molarity of a solution containing 58.5g NaCl in 2 liters of solution. Molecular weight of NaCl = 58.5 g/mol">
+                ⚗️ Chemistry: Molarity and concentration calculation
+            </div>
+            <div class="sample-question" data-question="A car accelerates from rest at 4 m/s² for 5 seconds. Calculate the distance traveled and final velocity.">
+                🚗 Physics: Kinematics with constant acceleration
             </div>
         </div>
         
         <div class="footer">
-            <p>🌟 Made with ❤️ for students who dream big but lack resources</p>
-            <p>Free forever • No ads • Open source</p>
+            <p>🌟 Powered by Custom AI Model - Built specifically for JEE preparation</p>
+            <p>🔓 Free forever • 🚫 No ads • 🌍 Open source • 🎓 Made by students, for students</p>
+            <p style="margin-top: 10px; font-size: 0.8em;">
+                <strong>Tech Stack:</strong> Custom Python AI Model + Flask Backend + Responsive Frontend
+            </p>
         </div>
     </div>
 
     <script>
+        // Global variables
+        let totalSolved = 0;
+        
         // Subject selection
         document.querySelectorAll('.subject-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -261,10 +392,15 @@ For example:
         document.querySelectorAll('.sample-question').forEach(question => {
             question.addEventListener('click', () => {
                 document.getElementById('questionInput').value = question.dataset.question;
+                // Add visual feedback
+                question.style.background = '#e8f5e8';
+                setTimeout(() => {
+                    question.style.background = 'white';
+                }, 300);
             });
         });
 
-        // Main solve function
+        // Main solve function - connects to Python backend
         document.getElementById('solveBtn').addEventListener('click', async () => {
             const question = document.getElementById('questionInput').value.trim();
             const subject = document.querySelector('.subject-btn.active').dataset.subject;
@@ -277,117 +413,92 @@ For example:
             const solveBtn = document.getElementById('solveBtn');
             const solutionSection = document.getElementById('solutionSection');
             const solutionContent = document.getElementById('solutionContent');
+            const confidenceScore = document.getElementById('confidenceScore');
             
             // Show loading state
-            solveBtn.innerHTML = '<div class="loading"></div>Solving...';
+            solveBtn.innerHTML = '<div class="loading"></div>AI is thinking...';
             solveBtn.disabled = true;
             
             try {
-                // Simulate AI processing (replace this with actual AI API call)
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Send request to Python backend
+                const response = await fetch('/solve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        subject: subject
+                    })
+                });
                 
-                // Demo solution (replace with actual AI response)
-                const solution = generateDemoSolution(question, subject);
+                const data = await response.json();
                 
-                solutionContent.textContent = solution;
-                solutionSection.classList.add('show');
-                solutionSection.scrollIntoView({ behavior: 'smooth' });
+                if (data.success) {
+                    // Display AI solution
+                    solutionContent.textContent = data.solution;
+                    confidenceScore.textContent = `Confidence: ${Math.round(data.confidence * 100)}%`;
+                    solutionSection.classList.add('show');
+                    
+                    // Update stats
+                    totalSolved++;
+                    document.getElementById('totalSolved').textContent = totalSolved;
+                    
+                    // Smooth scroll to solution
+                    solutionSection.scrollIntoView({ behavior: 'smooth' });
+                    
+                } else {
+                    // Show error message
+                    solutionContent.innerHTML = `
+                        <div class="error-message">
+                            <strong>Oops! Something went wrong:</strong><br>
+                            ${data.error || 'Unable to process the question. Please try again.'}
+                        </div>
+                    `;
+                    solutionSection.classList.add('show');
+                }
                 
             } catch (error) {
-                solutionContent.textContent = 'Sorry, there was an error processing your question. Please try again.';
+                console.error('Error:', error);
+                
+                // Fallback to demo solution if backend is unavailable
+                console.log('Backend unavailable, using demo mode...');
+                const demoSolution = generateDemoSolution(question, subject);
+                solutionContent.textContent = demoSolution;
+                confidenceScore.textContent = 'Demo Mode - Connect Python backend for full AI power';
                 solutionSection.classList.add('show');
+                solutionSection.scrollIntoView({ behavior: 'smooth' });
             } finally {
-                solveBtn.innerHTML = '🚀 Solve This Problem';
+                solveBtn.innerHTML = '🚀 Solve with Custom AI';
                 solveBtn.disabled = false;
             }
         });
 
-        // Demo solution generator (replace with actual AI integration)
+        // Demo solution for when backend is not connected
         function generateDemoSolution(question, subject) {
-            const solutions = {
-                physics: `📋 STEP-BY-STEP SOLUTION:
+            return `🔧 DEMO MODE ACTIVE
 
-🎯 Given Information:
-- This appears to be a ${subject} problem
-- Key concepts involved: Motion, Forces, Energy
+⚠️ To see the full power of our custom AI model:
+1. Set up the Python backend (app.py)
+2. Install required packages: pip install flask torch transformers
+3. Run: python app.py
+4. The AI will then provide detailed, step-by-step solutions!
 
-📐 Solution Steps:
-1. Identify the given values and what we need to find
-2. Choose the appropriate physics formula
-3. Substitute the values
-4. Calculate the result
-5. Check units and reasonableness
+📋 Current Question Analysis:
+Subject: ${subject.toUpperCase()}
+Question: "${question.substring(0, 100)}${question.length > 100 ? '...' : ''}"
 
-💡 Detailed Working:
-[This is a demo solution. In the real app, AI will provide detailed step-by-step solutions]
+🎯 What the full AI model provides:
+✓ Automatic problem type identification
+✓ Relevant formula extraction
+✓ Step-by-step mathematical solutions
+✓ Concept explanations and study tips
+✓ Multiple solution approaches
+✓ JEE-specific problem patterns
 
-✅ Final Answer:
-The solution involves applying fundamental physics principles.
+🚀 This demo shows the interface - connect the Python backend to unlock the real AI power!
 
-🎓 Key Learning Points:
-- Remember to identify given values first
-- Use appropriate formulas
-- Always check your units
-- Practice similar problems for better understanding
-
-💫 Need more help? Try breaking down complex problems into smaller steps!`,
-
-                chemistry: `🧪 CHEMISTRY SOLUTION:
-
-🎯 Given Information:
-- This is a ${subject} problem
-- Key concepts: Chemical reactions, Stoichiometry, Molecular calculations
-
-📋 Solution Approach:
-1. Identify the type of chemical problem
-2. Write relevant equations
-3. Apply stoichiometric principles
-4. Calculate step by step
-5. Verify the answer
-
-💡 Detailed Working:
-[This is a demo solution. In the real app, AI will provide detailed chemical equations and calculations]
-
-✅ Final Answer:
-The solution follows chemical principles and stoichiometry.
-
-🎓 Key Learning Points:
-- Balance chemical equations first
-- Use molar relationships
-- Pay attention to significant figures
-- Practice with different reaction types
-
-🧬 Remember: Chemistry is about understanding molecular interactions!`,
-
-                mathematics: `📐 MATHEMATICS SOLUTION:
-
-🎯 Given Problem:
-- This is a ${subject} problem
-- Key concepts: Algebra, Calculus, Geometry (as applicable)
-
-📋 Solution Method:
-1. Analyze the problem type
-2. Identify the mathematical concepts needed
-3. Apply appropriate formulas or methods
-4. Solve step by step
-5. Verify the solution
-
-💡 Detailed Working:
-[This is a demo solution. In the real app, AI will provide detailed mathematical steps]
-
-✅ Final Answer:
-The solution follows mathematical principles and logic.
-
-🎓 Key Learning Points:
-- Break complex problems into smaller parts
-- Use systematic approaches
-- Check your work by substitution
-- Practice regularly for speed and accuracy
-
-📊 Pro Tip: Always draw diagrams when possible - they make math problems clearer!`
-            };
-
-            return solutions[subject] || solutions.physics;
+💡 The custom model is specifically trained for JEE problems and provides much better solutions than generic AI APIs.`;
         }
 
         // Add some interactive animations
@@ -402,6 +513,29 @@ The solution follows mathematical principles and logic.
                 container.style.opacity = '1';
                 container.style.transform = 'translateY(0)';
             }, 100);
+            
+            // Add typing effect to placeholder
+            const textarea = document.getElementById('questionInput');
+            const placeholder = textarea.placeholder;
+            textarea.placeholder = '';
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < placeholder.length) {
+                    textarea.placeholder += placeholder.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 20);
+                }
+            };
+            
+            setTimeout(typeWriter, 1000);
+        });
+
+        // Add keyboard shortcut (Ctrl+Enter to solve)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.getElementById('solveBtn').click();
+            }
         });
     </script>
 </body>
